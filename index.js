@@ -21,17 +21,29 @@ app.get('/', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const data = req.body;
+
+    if (typeof data.pin !== 'string' || data.pin.length < 6) {
+        res.json({error: 'Pin kurang dari 6 angka/huruf.'});
+        return;
+    }
+
+    if (data.pin !== data.konfirmasiPin) {
+        res.json({error: 'Konfirmasi pin tidak sama.'});
+        return;
+    }
+
     const token = createHash(data.userId + new Date().getMilliseconds().toString());
     const user = new models.Users({
         ...data,
         pin: createHash(data.pin),
         token
     });
+
     try {
         await user.save();
         res.json({result: {token}});
     } catch (error) {
-        res.json({error: error.errmsg});
+        res.json({error});
     }
 });
 
