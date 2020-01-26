@@ -44,15 +44,20 @@ app.post('/login', async (req, res) => {
         if (user) {
             res.json({result: {token}});
         } else {
-            res.json({error: 'Cannot find user!'});
+            res.json({error: 'Cannot find user.'});
         }
     } catch (error) {
         res.json({error: error.errmsg});
     }
 });
 
-app.get('/user', auth, (req, res) => {
-    res.json({hehe: 'lmao', user: req.user});
+app.get('/user', auth, async (req, res) => {
+    try {
+        const user = await models.Users.findById(req.userId);
+        res.json({result: user});
+    } catch (error) {
+        res.json({error: error.errmsg});
+    }
 });
 
 mongoose.connect(process.env.DB_URI, {
