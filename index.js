@@ -2,8 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const models = require('./Models');
 const crypto = require('crypto');
+const models = require('./Models');
+const auth = require('./AuthMiddleware');
 
 const PORT = 5000;
 const app = express();
@@ -43,14 +44,23 @@ app.post('/login', async (req, res) => {
         if (user) {
             res.json({result: {token}});
         } else {
-            res.json({result: false});
+            res.json({error: 'Cannot find user!'});
         }
     } catch (error) {
         res.json({error: error.errmsg});
     }
 });
 
-mongoose.connect(process.env.DB_URI, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}).then(() => {
+app.get('/user', auth, (req, res) => {
+    res.json({hehe: 'lmao', user: req.user});
+});
+
+mongoose.connect(process.env.DB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true
+}).then(() => {
     console.log('Database connected.');
 });
 
