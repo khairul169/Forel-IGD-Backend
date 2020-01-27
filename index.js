@@ -72,6 +72,54 @@ app.get('/user', auth, async (req, res) => {
     }
 });
 
+app.post('/pasien_baru', async (req, res) => {
+    const data = req.body;
+    
+    try {
+        console.log(data);
+        if (!data.pasien || !data.pj) {
+            throw new Error('Data tidak lengkap.');
+        }
+        
+        if (!data.pasien.rm.trim() || !data.pasien.nama.trim()) {
+            throw new Error('RM dan Nama pasien tidak boleh kosong.');
+        }
+        
+        if (!data.pj.nama.trim()) {
+            throw new Error('Nama penanggung jawab tidak boleh kosong.');
+        }
+
+        const pasien = new models.Pasien(data.pasien);
+        const pasienResult = await pasien.save();
+
+        if (!pasienResult) {
+            throw new Error('Gagal menyimpan data pasien.');
+        }
+
+        const pj = new models.PJPasien(data.pj);
+        const pjResult = await pj.save();
+
+        if (!pjResult) {
+            throw new Error('Gagal menyimpan data penanggung jawab.');
+        }
+
+        const pendaftaran = new models.Pendaftaran({
+            pasienId: pasienResult._id,
+            pjId: pjResult._id,
+            jenis: data.jenis
+        });
+        const result = await pendaftaran.save();
+
+        if (!result) {
+            throw new Error('Gagal menyimpan data pendaftaran.');
+        }
+
+        res.json({result});
+    } catch ({message}) {
+        res.json({error: message});
+    }
+});
+
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
