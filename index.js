@@ -33,7 +33,7 @@ app.post('/register', async (req, res) => {
     }
 
     const token = createHash(data.userId + new Date().getMilliseconds().toString());
-    const user = new models.Users({
+    const user = new models.User({
         ...data,
         pin: createHash(data.pin),
         token
@@ -52,7 +52,7 @@ app.post('/login', async (req, res) => {
     const pinHash = createHash(data.pin);
     try {
         const token = createHash(data.userId + new Date().getMilliseconds().toString());
-        let user = await models.Users.findOneAndUpdate({userId: data.userId, pin: pinHash}, {token});
+        let user = await models.User.findOneAndUpdate({userId: data.userId, pin: pinHash}, {token});
         if (user) {
             res.json({result: {token}});
         } else {
@@ -65,14 +65,14 @@ app.post('/login', async (req, res) => {
 
 app.get('/user', auth, async (req, res) => {
     try {
-        const user = await models.Users.findById(req.userId);
+        const user = await models.User.findById(req.userId);
         res.json({result: user});
     } catch (error) {
         res.json({error: error.errmsg});
     }
 });
 
-app.post('/pasien_baru', async (req, res) => {
+app.post('/pasien_baru', auth, async (req, res) => {
     const data = req.body;
     
     try {
@@ -89,25 +89,7 @@ app.post('/pasien_baru', async (req, res) => {
             throw new Error('Nama penanggung jawab tidak boleh kosong.');
         }
 
-        const pasien = new models.Pasien(data.pasien);
-        const pasienResult = await pasien.save();
-
-        if (!pasienResult) {
-            throw new Error('Gagal menyimpan data pasien.');
-        }
-
-        const pj = new models.PJPasien(data.pj);
-        const pjResult = await pj.save();
-
-        if (!pjResult) {
-            throw new Error('Gagal menyimpan data penanggung jawab.');
-        }
-
-        const pendaftaran = new models.Pendaftaran({
-            pasienId: pasienResult._id,
-            pjId: pjResult._id,
-            jenis: data.jenis
-        });
+        const pendaftaran = new models.Pendaftaran(data);
         const result = await pendaftaran.save();
 
         if (!result) {
@@ -117,6 +99,42 @@ app.post('/pasien_baru', async (req, res) => {
         res.json({result});
     } catch ({message}) {
         res.json({error: message});
+    }
+});
+
+app.get('/pendaftaran', auth, async (req, res) => {
+    try {
+        let rows = await models.Pendaftaran.find({});
+
+        res.json({result: rows});
+    } catch (error) {
+        res.json({error: error.errmsg});
+    }
+});
+
+app.post('/pendaftaran', auth, async (req, res) => {
+    try {
+        const {rm, nama, jenis} = req.body;
+        const searchQuery = {};
+
+        if (jenis) {
+            searchQuery.jenis = jenis;
+        }
+
+        if (rm) searchQuery['pasien.rm'] = {
+            $regex: rm,
+            $options: 'i'
+        };
+
+        if (nama) searchQuery['pasien.nama'] = {
+            $regex: nama,
+            $options: 'i'
+        };
+
+        const rows = await models.Pendaftaran.find(searchQuery);
+        res.json({result: rows});
+    } catch (error) {
+        res.json({error: error.errmsg});
     }
 });
 

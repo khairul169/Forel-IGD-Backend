@@ -5,7 +5,7 @@ const auth = async (req, res, next) => {
     const token = authHeader ? authHeader.replace('Bearer', '').trim() : null;
 
     try {
-        const user = await models.Users.findOne({token});
+        const user = await models.User.findOne({token});
         if (!user) {
             throw new Error();
         }
