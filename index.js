@@ -114,7 +114,7 @@ app.get('/pendaftaran', auth, async (req, res) => {
 
 app.post('/pendaftaran', auth, async (req, res) => {
     try {
-        const {rm, nama, jenis} = req.body;
+        const {rm, nama, jenis, ttl} = req.body;
         const searchQuery = {};
 
         if (jenis) {
@@ -131,7 +131,12 @@ app.post('/pendaftaran', auth, async (req, res) => {
             $options: 'i'
         };
 
-        const rows = await models.Pendaftaran.find(searchQuery);
+        if (ttl) searchQuery['pasien.ttl'] = {
+            $regex: ttl,
+            $options: 'i'
+        };
+
+        const rows = await models.Pendaftaran.find(searchQuery).sort({tanggal: 'desc'});
         res.json({result: rows});
     } catch (error) {
         res.json({error: error.errmsg});
