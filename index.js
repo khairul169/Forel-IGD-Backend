@@ -76,7 +76,6 @@ app.post('/pasien_baru', auth, async (req, res) => {
     const data = req.body;
     
     try {
-        console.log(data);
         if (!data.pasien || !data.pj) {
             throw new Error('Data tidak lengkap.');
         }
@@ -88,6 +87,9 @@ app.post('/pasien_baru', auth, async (req, res) => {
         if (!data.pj.nama.trim()) {
             throw new Error('Nama penanggung jawab tidak boleh kosong.');
         }
+
+        // Set jenis pasien
+        data.jenis = data.pasien.jenis;
 
         const pendaftaran = new models.Pendaftaran(data);
         const result = await pendaftaran.save();
@@ -104,11 +106,28 @@ app.post('/pasien_baru', auth, async (req, res) => {
 
 app.get('/pendaftaran', auth, async (req, res) => {
     try {
-        let rows = await models.Pendaftaran.find({});
-
+        let rows = await models.Pendaftaran.find({}).sort('-tanggal');
         res.json({result: rows});
     } catch (error) {
-        res.json({error: error.errmsg});
+        res.json({error});
+    }
+});
+
+app.get('/pendaftaran/jenis/:jenis', auth, async (req, res) => {
+    try {
+        let rows = await models.Pendaftaran.find({jenis: req.params.jenis}).sort('-tanggal');
+        res.json({result: rows});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
+app.get('/pendaftaran/id/:id', auth, async (req, res) => {
+    try {
+        let rows = await models.Pendaftaran.findById(req.params.id);
+        res.json({result: rows});
+    } catch (error) {
+        res.json({error});
     }
 });
 
@@ -136,7 +155,7 @@ app.post('/pendaftaran', auth, async (req, res) => {
             $options: 'i'
         };
 
-        const rows = await models.Pendaftaran.find(searchQuery).sort({tanggal: 'desc'});
+        const rows = await models.Pendaftaran.find(searchQuery).sort('-tanggal');
         res.json({result: rows});
     } catch (error) {
         res.json({error: error.errmsg});

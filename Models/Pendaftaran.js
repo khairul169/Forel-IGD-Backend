@@ -11,15 +11,15 @@ const PasienSchema = new mongoose.Schema({
         required: true,
     },
     nik: String,
-    kelamin: Number,
+    kelamin: String,
     ttl: String,
-    kebangsaan: Number,
+    kebangsaan: String,
     alamat: String,
     telp: String,
-    agama: Number,
-    perkawinan: Number,
-    pekerjaan: Number,
-    pendidikan: Number
+    agama: String,
+    perkawinan: String,
+    pekerjaan: String,
+    pendidikan: String
 });
 
 const PjSchema = new mongoose.Schema({
@@ -28,12 +28,12 @@ const PjSchema = new mongoose.Schema({
         required: true,
     },
     nik: String,
-    kelamin: Number,
+    kelamin: String,
     hubungan: String,
     alamat: String,
     telp: String,
-    pekerjaan: Number,
-    pendidikan: Number,
+    pekerjaan: String,
+    pendidikan: String,
     wali: String,
     telpWali: String
 });
@@ -48,7 +48,7 @@ const schema = new Schema({
         required: true
     },
     jenis: {
-        type: Number,
+        type: String,
         required: true,
         default: 1
     },
