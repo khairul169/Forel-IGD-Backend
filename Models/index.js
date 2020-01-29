@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
-const UserSchema = require('./User');
-const PendaftaranSchema = require('./Pendaftaran');
-
-const User = mongoose.model('User', UserSchema, 'users');
-const Pendaftaran = mongoose.model('Pendaftaran', PendaftaranSchema, 'pendaftaran');
+// Models
+const User = require('./User');
+const Pendaftaran = require('./Pendaftaran');
+const Pengkajian = require('./Pengkajian');
 
 module.exports = {
     User,
-    Pendaftaran
+    Pendaftaran,
+    Pengkajian
 };

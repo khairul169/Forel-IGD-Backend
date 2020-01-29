@@ -1,42 +1,7 @@
 const mongoose = require('mongoose');
 const {Schema} = mongoose;
-
-const PasienSchema = new mongoose.Schema({
-    rm: {
-        type: String,
-        required: true,
-    },
-    nama: {
-        type: String,
-        required: true,
-    },
-    nik: String,
-    kelamin: String,
-    ttl: String,
-    kebangsaan: String,
-    alamat: String,
-    telp: String,
-    agama: String,
-    perkawinan: String,
-    pekerjaan: String,
-    pendidikan: String
-});
-
-const PjSchema = new mongoose.Schema({
-    nama: {
-        type: String,
-        required: true,
-    },
-    nik: String,
-    kelamin: String,
-    hubungan: String,
-    alamat: String,
-    telp: String,
-    pekerjaan: String,
-    pendidikan: String,
-    wali: String,
-    telpWali: String
-});
+const PasienSchema = require('./Schemas/Pasien');
+const PjSchema = require('./Schemas/Pj');
 
 const schema = new Schema({
     pasien: {
@@ -59,4 +24,6 @@ const schema = new Schema({
     }
 });
 
-module.exports = schema;
+const Pendaftaran = mongoose.model('Pendaftaran', schema, 'pendaftaran');
+
+module.exports = Pendaftaran;

@@ -6,30 +6,32 @@ const schema = new mongoose.Schema({
         required: true,
         unique: true,
         minlength: 6,
-        trim: true
+        trim: true,
     },
     nama: {
         type: String,
         required: true,
         minlength: 6,
-        trim: true
+        trim: true,
     },
     email: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
     },
     pin: {
         type: String,
         required: true,
     },
     type: {
-        type: Number,
-        default: 0
+        type: String,
+        default: '0',
     },
     token: {
         type: String,
     }
-})
+});
 
-module.exports = schema;
+const User = mongoose.model('User', schema, 'users');
+
+module.exports = User;

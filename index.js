@@ -162,6 +162,28 @@ app.post('/pendaftaran', auth, async (req, res) => {
     }
 });
 
+app.get('/pengkajian/:id', auth, async (req, res) => {
+    try {
+        const row = await models.Pengkajian.findOne({pendaftaran: req.params.id});
+        res.json({result: row});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
+app.post('/pengkajian', auth, async (req, res) => {
+    try {
+        const {id, data} = req.body;
+        const result = await models.Pengkajian.findOneAndUpdate({ pendaftaran: id }, data, {
+            new: true,
+            upsert: true
+        });
+        res.json({result});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
