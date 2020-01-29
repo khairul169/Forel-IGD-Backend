@@ -10,16 +10,17 @@ const PORT = 5000;
 const app = express();
 dotenv.config();
 
+const BASE_URL = process.env.BASE_URL || '';
 const createHash = (string) => crypto.createHash('md5').update(string).digest('hex');
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.get(BASE_URL + '/', (req, res) => {
     res.json({hello: 'world!'});
 });
 
-app.post('/register', async (req, res) => {
+app.post(BASE_URL + '/register', async (req, res) => {
     const data = req.body;
 
     if (typeof data.pin !== 'string' || data.pin.length < 6) {
@@ -47,7 +48,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
+app.post(BASE_URL + '/login', async (req, res) => {
     const data = req.body;
     const pinHash = createHash(data.pin);
     try {
@@ -63,7 +64,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/user', auth, async (req, res) => {
+app.get(BASE_URL + '/user', auth, async (req, res) => {
     try {
         const user = await models.User.findById(req.userId);
         res.json({result: user});
@@ -72,7 +73,7 @@ app.get('/user', auth, async (req, res) => {
     }
 });
 
-app.post('/pasien_baru', auth, async (req, res) => {
+app.post(BASE_URL + '/pasien_baru', auth, async (req, res) => {
     const data = req.body;
     
     try {
@@ -104,7 +105,7 @@ app.post('/pasien_baru', auth, async (req, res) => {
     }
 });
 
-app.get('/pendaftaran', auth, async (req, res) => {
+app.get(BASE_URL + '/pendaftaran', auth, async (req, res) => {
     try {
         let rows = await models.Pendaftaran.find({}).sort('-tanggal');
         res.json({result: rows});
@@ -113,7 +114,7 @@ app.get('/pendaftaran', auth, async (req, res) => {
     }
 });
 
-app.get('/pendaftaran/:id', auth, async (req, res) => {
+app.get(BASE_URL + '/pendaftaran/:id', auth, async (req, res) => {
     try {
         let rows = await models.Pendaftaran.findById(req.params.id);
         res.json({result: rows});
@@ -122,7 +123,7 @@ app.get('/pendaftaran/:id', auth, async (req, res) => {
     }
 });
 
-app.post('/pendaftaran', auth, async (req, res) => {
+app.post(BASE_URL + '/pendaftaran', auth, async (req, res) => {
     try {
         const {rm, nama, jenis, ttl} = req.body;
         const searchQuery = {};
@@ -153,7 +154,7 @@ app.post('/pendaftaran', auth, async (req, res) => {
     }
 });
 
-app.get('/pengkajian/:id', auth, async (req, res) => {
+app.get(BASE_URL + '/pengkajian/:id', auth, async (req, res) => {
     try {
         const row = await models.Pengkajian.findOne({pendaftaran: req.params.id});
         res.json({result: row});
@@ -162,7 +163,7 @@ app.get('/pengkajian/:id', auth, async (req, res) => {
     }
 });
 
-app.post('/pengkajian', auth, async (req, res) => {
+app.post(BASE_URL + '/pengkajian', auth, async (req, res) => {
     try {
         const {id, data} = req.body;
         const result = await models.Pengkajian.findOneAndUpdate({ pendaftaran: id }, data, {
@@ -175,7 +176,7 @@ app.post('/pengkajian', auth, async (req, res) => {
     }
 });
 
-app.get('/ringkasan/:id', auth, async (req, res) => {
+app.get(BASE_URL + '/ringkasan/:id', auth, async (req, res) => {
     try {
         const row = await models.Ringkasan.findOne({pendaftaran: req.params.id})
             .populate('pendaftaran');
@@ -185,7 +186,7 @@ app.get('/ringkasan/:id', auth, async (req, res) => {
     }
 });
 
-app.post('/ringkasan', auth, async (req, res) => {
+app.post(BASE_URL + '/ringkasan', auth, async (req, res) => {
     try {
         const {id, data} = req.body;
         const result = await models.Ringkasan.findOneAndUpdate({ pendaftaran: id }, data, {
@@ -198,7 +199,7 @@ app.post('/ringkasan', auth, async (req, res) => {
     }
 });
 
-app.get('/rtl/:id', auth, async (req, res) => {
+app.get(BASE_URL + '/rtl/:id', auth, async (req, res) => {
     try {
         const row = await models.TindakLanjut.findOne({pendaftaran: req.params.id})
             .populate('pendaftaran');
@@ -208,7 +209,7 @@ app.get('/rtl/:id', auth, async (req, res) => {
     }
 });
 
-app.post('/rtl', auth, async (req, res) => {
+app.post(BASE_URL + '/rtl', auth, async (req, res) => {
     try {
         const {id, data} = req.body;
         const result = await models.TindakLanjut.findOneAndUpdate({ pendaftaran: id }, data, {
