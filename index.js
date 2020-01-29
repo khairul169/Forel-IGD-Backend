@@ -198,6 +198,29 @@ app.post('/ringkasan', auth, async (req, res) => {
     }
 });
 
+app.get('/rtl/:id', auth, async (req, res) => {
+    try {
+        const row = await models.TindakLanjut.findOne({pendaftaran: req.params.id})
+            .populate('pendaftaran');
+        res.json({result: row});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
+app.post('/rtl', auth, async (req, res) => {
+    try {
+        const {id, data} = req.body;
+        const result = await models.TindakLanjut.findOneAndUpdate({ pendaftaran: id }, data, {
+            new: true,
+            upsert: true
+        });
+        res.json({result});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
 mongoose.connect(process.env.DB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
