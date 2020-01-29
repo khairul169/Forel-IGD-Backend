@@ -113,16 +113,7 @@ app.get('/pendaftaran', auth, async (req, res) => {
     }
 });
 
-app.get('/pendaftaran/jenis/:jenis', auth, async (req, res) => {
-    try {
-        let rows = await models.Pendaftaran.find({jenis: req.params.jenis}).sort('-tanggal');
-        res.json({result: rows});
-    } catch (error) {
-        res.json({error});
-    }
-});
-
-app.get('/pendaftaran/id/:id', auth, async (req, res) => {
+app.get('/pendaftaran/:id', auth, async (req, res) => {
     try {
         let rows = await models.Pendaftaran.findById(req.params.id);
         res.json({result: rows});
@@ -175,6 +166,29 @@ app.post('/pengkajian', auth, async (req, res) => {
     try {
         const {id, data} = req.body;
         const result = await models.Pengkajian.findOneAndUpdate({ pendaftaran: id }, data, {
+            new: true,
+            upsert: true
+        });
+        res.json({result});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
+app.get('/ringkasan/:id', auth, async (req, res) => {
+    try {
+        const row = await models.Ringkasan.findOne({pendaftaran: req.params.id})
+            .populate('pendaftaran');
+        res.json({result: row});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
+app.post('/ringkasan', auth, async (req, res) => {
+    try {
+        const {id, data} = req.body;
+        const result = await models.Ringkasan.findOneAndUpdate({ pendaftaran: id }, data, {
             new: true,
             upsert: true
         });
