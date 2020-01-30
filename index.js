@@ -114,6 +114,22 @@ app.get(BASE_URL + '/pendaftaran', auth, async (req, res) => {
     }
 });
 
+app.get(BASE_URL + '/jumlah', auth, async (req, res) => {
+    try {
+        const now = new Date();
+        const dateToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const today = {tanggal: {$gte: dateToday}};
+        const ponek = await models.Pendaftaran.countDocuments({...today, jenis: '0'});
+        const nonPonek = await models.Pendaftaran.countDocuments({...today, jenis: '1'});
+
+        res.json({result: {
+            total: ponek + nonPonek, ponek, nonPonek
+        }});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
 app.get(BASE_URL + '/pendaftaran/:id', auth, async (req, res) => {
     try {
         let rows = await models.Pendaftaran.findById(req.params.id);

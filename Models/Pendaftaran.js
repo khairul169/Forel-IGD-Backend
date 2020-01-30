@@ -18,9 +18,9 @@ const schema = new Schema({
         default: 1
     },
     tanggal: {
-        type: Schema.Types.Date,
+        type: Date,
         required: true,
-        default: new Date()
+        default: Date.now
     }
 });
 
