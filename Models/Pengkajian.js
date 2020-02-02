@@ -7,6 +7,8 @@ const schema = new Schema({
         required: true,
         ref: 'Pendaftaran',
     },
+    
+    // Pengkajian
     waktu: Date,
     auto: String,
     alloo: String,
@@ -74,6 +76,8 @@ const schema = new Schema({
     crt: String,
     kuatNadi: String,
     edema: String,
+
+    // Ringkasan
     rKeadaanUmum: String,
     rKeadaan: String,
     rEye: String,
@@ -89,6 +93,25 @@ const schema = new Schema({
     rEws: String,
     rNyeri: String,
     rSkalaNyeri: String,
+
+    // Tindak lanjut
+    waktuKeluar: Date,
+    tindakLanjut: String,
+    pindah: String,
+    dirujukKe: String,
+    alasanRujuk: String,
+    rujukKe: String,
+    rujukKeLain: String,
+    pulang: String,
+    menolakRawat: String,
+    kontrol: String,
+    edukasi: String,
+    diet: String,
+    minumObat: String,
+    edukasiLain: String,
+    obatPulang: String,
+
+    // Masalah
     diagnosaBanding: String,
     permasalahan: String,
     targetTerukur: String,
