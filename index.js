@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 const crypto = require('crypto');
 const models = require('./Models');
 const auth = require('./AuthMiddleware');
+const nodeMailer = require('nodemailer');
 
 const PORT = 5000;
 const app = express();
@@ -13,11 +14,34 @@ dotenv.config();
 const BASE_URL = process.env.BASE_URL || '';
 const createHash = (string) => crypto.createHash('md5').update(string).digest('hex');
 
+const mailTransport = nodeMailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.STMT_USER,
+        pass: process.env.STMT_PASS
+    }
+});
+
+const sendEmail = async (to, subject, text) => {
+    const mail = await mailTransport.sendMail({
+        from: {
+            name: 'Formulir Elektronik IGD RSIA Puri',
+            address: 'forel.igd@gmail.com'
+        },
+        to,
+        subject,
+        text
+    });
+    return mail;
+}
+
 app.use(cors());
 app.use(express.json());
 
 app.get(BASE_URL + '/', (req, res) => {
-    res.json({hello: 'world!'});
+    res.json({result: 'Hello world!'});
 });
 
 app.post(BASE_URL + '/register', async (req, res) => {
@@ -61,6 +85,78 @@ app.post(BASE_URL + '/login', async (req, res) => {
         }
     } catch (error) {
         res.json({error: error.errmsg});
+    }
+});
+
+app.post(BASE_URL + '/lupa', async (req, res) => {
+    try {
+        const {userId} = req.body;
+        const user = await models.User.findOne({userId});
+        if (!user) {
+            throw new Error('Email tidak terdaftar!')
+        }
+
+        const secret = Math.floor(100000 + Math.random() * 900000);
+        const data = {
+            secret
+        };
+        await models.ResetPass.findOneAndUpdate({ user: user._id }, data, {
+            new: true,
+            upsert: true
+        });
+        
+        // Then send email
+        sendEmail(user.email, 'Lupa Pin Pengguna', 'Nomor Rahasia: ' + secret.toString());
+
+        res.json({result: {
+            id: user._id,
+            email: user.email
+        }});
+    } catch (error) {
+        res.json({error});
+    }
+});
+
+app.post(BASE_URL + '/lupa/validate', async (req, res) => {
+    try {
+        const {id, secret} = req.body;
+        const result = await models.ResetPass.findOne({user: id, secret});
+        if (!result) {
+            throw new Error('Gagal validasi data!');
+        }
+
+        res.json({result: true});
+    } catch ({message}) {
+        res.json({error: message});
+    }
+});
+
+app.post(BASE_URL + '/lupa/reset', async (req, res) => {
+    try {
+        const {id, secret, pin} = req.body;
+
+        const token = await models.ResetPass.findOne({user: id, secret});
+        if (!token) {
+            throw new Error('Gagal validasi data!');
+        }
+
+        if (!pin || !pin.trim()) {
+            throw new Error('Pin baru kosong!');
+        }
+
+        // Update new pin
+        const newPin = createHash(pin);
+        const result = await models.User.findOneAndUpdate({_id: token.user, pin: newPin});
+        if (!result) {
+            throw new Error('Gagal reset pin!');
+        }
+
+        // Remove reset pin request
+        await models.ResetPass.findOneAndDelete({_id: token._id});
+
+        res.json({result: true});
+    } catch ({message}) {
+        res.json({error: message});
     }
 });
 
