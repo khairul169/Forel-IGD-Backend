@@ -141,17 +141,17 @@ app.post(BASE_URL + '/pendaftaran', auth, async (req, res) => {
             searchQuery.jenis = jenis;
         }
 
-        if (rm) searchQuery['pasien.rm'] = {
+        if (rm) searchQuery['rm'] = {
             $regex: rm,
             $options: 'i'
         };
 
-        if (nama) searchQuery['pasien.nama'] = {
+        if (nama) searchQuery['nama'] = {
             $regex: nama,
             $options: 'i'
         };
 
-        if (ttl) searchQuery['pasien.ttl'] = {
+        if (ttl) searchQuery['tempatLahir'] = {
             $regex: ttl,
             $options: 'i'
         };
