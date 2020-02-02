@@ -77,20 +77,13 @@ app.post(BASE_URL + '/pasien_baru', auth, async (req, res) => {
     const data = req.body;
     
     try {
-        if (!data.pasien || !data.pj) {
-            throw new Error('Data tidak lengkap.');
-        }
-        
-        if (!data.pasien.rm.trim() || !data.pasien.nama.trim()) {
+        if (!data.rm.trim() || !data.nama.trim()) {
             throw new Error('RM dan Nama pasien tidak boleh kosong.');
         }
         
-        if (!data.pj.nama.trim()) {
+        if (!data.namaPj.trim()) {
             throw new Error('Nama penanggung jawab tidak boleh kosong.');
         }
-
-        // Set jenis pasien
-        data.jenis = data.pasien.jenis;
 
         const pendaftaran = new models.Pendaftaran(data);
         const result = await pendaftaran.save();
