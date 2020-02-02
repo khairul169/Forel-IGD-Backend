@@ -106,7 +106,7 @@ app.post(BASE_URL + '/lupa', async (req, res) => {
         });
         
         // Then send email
-        sendEmail(user.email, 'Lupa Pin Pengguna', 'Nomor Rahasia: ' + secret.toString());
+        sendEmail(user.email, 'Lupa Pin Pengguna', 'Kode Rahasia: ' + secret.toString());
 
         res.json({result: {
             id: user._id,
