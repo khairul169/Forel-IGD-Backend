@@ -118,6 +118,7 @@ const schema = new Schema({
     icd10: String,
     terapiTindakan: String,
     terapiMedika: String,
+    icd9: String,
     rencanaOperasi: String,
     rencanaKonsultasi: String,
 });
